@@ -78,7 +78,7 @@ export class ObservableStore<T> {
 
         if (this._settings.logStateChanges) {
             const caller = (this.constructor) ? '\r\nCaller: ' + this.constructor.name : '';
-            console.log('%cSTATE CHANGED', 'font-weight: bold', '\r\nAction: ', action, caller, '\r\nState: ', state);
+            console.log('%cSTATE CHANGED', 'font-weight: bold', '\r\nAction: ', action, caller, '\r\nPreviousState: ', previousState, '\r\nNewState: ', state);
         }
 
         return this.getState();
