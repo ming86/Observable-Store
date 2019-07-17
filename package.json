@@ -25,6 +25,7 @@
     "test": "jasmine-ts --project ./spec/tsconfig.json --config=./spec/jasmine.json"
   },
   "dependencies": {
+    "immer": "^3.1.3",
     "rxjs": "^6.5.2"
   },
   "devDependencies": {
