@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ClonerService } from './utilities/cloner.service';
+import cloneDeep from "lodash.clonedeep";
 
 export interface ObservableStoreSettings {
     trackStateHistory?: boolean;
@@ -14,7 +14,6 @@ export interface CurrentStoreState {
 }
 
 // static objects
-const clonerService = new ClonerService();
 let storeState: Readonly<any> =  null;
 let stateHistory: any[] = [];
 const settingsDefaults: ObservableStoreSettings = { 
@@ -40,12 +39,10 @@ export class ObservableStore<T> {
     public globalStateChanged: Observable<any>;
 
     private _stateDispatcher = new BehaviorSubject<any>(null);
-    private _clonerService: ClonerService;
     private _settings: ObservableStoreSettings
 
     constructor(settings: ObservableStoreSettings) {
         this._settings = Object.assign({}, settingsDefaults, settings);
-        this._clonerService = clonerService;
         
         this.stateChanged = this._stateDispatcher.asObservable();
         this.stateHistory = stateHistory;
@@ -75,7 +72,7 @@ export class ObservableStore<T> {
             this.stateHistory.push({ 
                 action, 
                 beginState: previousState, 
-                endState: this._clonerService.deepClone(this.getState()) 
+                endState: cloneDeep(this.getState()) 
             });
         }
 
@@ -89,12 +86,12 @@ export class ObservableStore<T> {
 
     protected getState() : T {
         const stateOrSlice = this._getStateOrSlice(storeState);
-        return this._clonerService.deepClone(stateOrSlice) as T;
+        return cloneDeep(stateOrSlice) as T;
     }
 
     protected logStateAction(state: any, action: string) {
         if (this._settings.trackStateHistory) {
-            this.stateHistory.push({ action, state: this._clonerService.deepClone(state) });
+            this.stateHistory.push({ action, state: cloneDeep(state) });
         }
     }
 
@@ -111,8 +108,8 @@ export class ObservableStore<T> {
 
     private _dispatchState(stateChanges: T) {
         const stateOrSlice = this._getStateOrSlice(storeState);
-        const clonedStateOrSlice = this._clonerService.deepClone(stateOrSlice);
-        const clonedGlobalState = this._clonerService.deepClone(storeState);
+        const clonedStateOrSlice = cloneDeep(stateOrSlice);
+        const clonedGlobalState = cloneDeep(storeState);
 
         if (this._settings.includeStateChangesOnSubscribe) {
             this._stateDispatcher.next({ state: clonedStateOrSlice, stateChanges });

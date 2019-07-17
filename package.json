@@ -25,10 +25,12 @@
     "test": "jasmine-ts --project ./spec/tsconfig.json --config=./spec/jasmine.json"
   },
   "dependencies": {
+    "lodash.clonedeep": "^4.5.0",
     "rxjs": "^6.5.2"
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
+    "@types/lodash.clonedeep": "^4.5.6",
     "jasmine": "^3.4.0",
     "jasmine-spec-reporter": "^4.2.1",
     "jasmine-ts": "^0.3.0",
