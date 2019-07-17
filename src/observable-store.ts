@@ -42,6 +42,7 @@ export class ObservableStore<T> {
     private _settings: ObservableStoreSettings
 
     constructor(settings: ObservableStoreSettings) {
+        // disable immer auto freeze
         setAutoFreeze(false);
         // this._settings = Object.assign({}, settingsDefaults, settings);
         this._settings = produce(Object.assign)({}, settingsDefaults, settings);
@@ -80,7 +81,7 @@ export class ObservableStore<T> {
 
         if (this._settings.logStateChanges) {
             const caller = (this.constructor) ? '\r\nCaller: ' + this.constructor.name : '';
-            console.log('%cSTATE CHANGED', 'font-weight: bold', '\r\nAction: ', action, caller, '\r\nState: ', state);
+            console.log('%cSTATE CHANGED', 'font-weight: bold', '\r\nAction: ', action, caller, '\r\nPreviousState: ', previousState, '\r\nNewState: ', state);
         }
 
         return this.getState();
