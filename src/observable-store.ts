@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { produce } from "immer";
+import { produce, setAutoFreeze } from "immer";
 
 export interface ObservableStoreSettings {
     trackStateHistory?: boolean;
@@ -42,7 +42,9 @@ export class ObservableStore<T> {
     private _settings: ObservableStoreSettings
 
     constructor(settings: ObservableStoreSettings) {
-        this._settings = Object.assign({}, settingsDefaults, settings);
+        setAutoFreeze(false);
+        // this._settings = Object.assign({}, settingsDefaults, settings);
+        this._settings = produce(Object.assign)({}, settingsDefaults, settings);
 
         this.stateChanged = this._stateDispatcher.asObservable();
         this.stateHistory = stateHistory;
@@ -96,7 +98,8 @@ export class ObservableStore<T> {
     }
 
     private _updateState(state: Partial<T>) {
-        storeState = (state) ? Object.assign({}, storeState, state) : null;
+        // storeState = (state) ? Object.assign({}, storeState, state) : null;
+        storeState = (state) ? produce(Object.assign)({}, storeState, state) : null;
     }
 
     private _getStateOrSlice(state: Readonly<any>): Readonly<any> {
