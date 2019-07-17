@@ -14,10 +14,10 @@ export interface CurrentStoreState {
 }
 
 // static objects
-let storeState: Readonly<any> =  null;
+let storeState: Readonly<any> = null;
 let stateHistory: any[] = [];
-const settingsDefaults: ObservableStoreSettings = { 
-    trackStateHistory: false, 
+const settingsDefaults: ObservableStoreSettings = {
+    trackStateHistory: false,
     logStateChanges: false,
     includeStateChangesOnSubscribe: false,
     stateSliceSelector: null
@@ -43,13 +43,13 @@ export class ObservableStore<T> {
 
     constructor(settings: ObservableStoreSettings) {
         this._settings = Object.assign({}, settingsDefaults, settings);
-        
+
         this.stateChanged = this._stateDispatcher.asObservable();
         this.stateHistory = stateHistory;
         this.globalStateChanged = globalStateDispatcher.asObservable();
     }
 
-    protected setState(state: Partial<T> | stateFunc<T> , action?: string, dispatchState: boolean = true) : T { 
+    protected setState(state: Partial<T> | stateFunc<T>, action?: string, dispatchState: boolean = true): T {
         // Needed for tracking below
         const previousState = this.getState();
 
@@ -63,16 +63,16 @@ export class ObservableStore<T> {
         else {
             throw Error('Pass an object or a function for the state parameter when calling setState().');
         }
-        
+
         if (dispatchState) {
             this._dispatchState(state as any);
         }
 
         if (this._settings.trackStateHistory) {
-            this.stateHistory.push({ 
-                action, 
-                beginState: previousState, 
-                endState: produce(this.getState(), draftState => {})
+            this.stateHistory.push({
+                action,
+                beginState: previousState,
+                endState: produce(this.getState(), draftState => { })
             });
         }
 
@@ -84,14 +84,14 @@ export class ObservableStore<T> {
         return this.getState();
     }
 
-    protected getState() : T {
+    protected getState(): T {
         const stateOrSlice = this._getStateOrSlice(storeState);
-        return produce(stateOrSlice, draftState => {}) as T;
+        return produce(stateOrSlice, draftState => { }) as T;
     }
 
     protected logStateAction(state: any, action: string) {
         if (this._settings.trackStateHistory) {
-            this.stateHistory.push({ action, state: produce(state, draftState => {}) });
+            this.stateHistory.push({ action, state: produce(state, draftState => { }) });
         }
     }
 
@@ -99,7 +99,7 @@ export class ObservableStore<T> {
         storeState = (state) ? Object.assign({}, storeState, state) : null;
     }
 
-    private _getStateOrSlice(state : Readonly<any>): Readonly<any> {
+    private _getStateOrSlice(state: Readonly<any>): Readonly<any> {
         if (this._settings.stateSliceSelector) {
             return this._settings.stateSliceSelector(storeState);
         }
@@ -110,12 +110,12 @@ export class ObservableStore<T> {
         const stateOrSlice = this._getStateOrSlice(storeState);
 
         if (this._settings.includeStateChangesOnSubscribe) {
-            this._stateDispatcher.next(produce(stateOrSlice, draftState => draftState = stateChanges));
-            globalStateDispatcher.next(produce(storeState, draftState => draftState = stateChanges));
+            this._stateDispatcher.next(produce(stateOrSlice, draftState => { return stateChanges }));
+            globalStateDispatcher.next(produce(storeState, draftState => { return stateChanges }));
         }
         else {
-            this._stateDispatcher.next(produce(stateOrSlice, draftState => {}));
-            globalStateDispatcher.next(produce(storeState, draftState => {}));
+            this._stateDispatcher.next(produce(stateOrSlice, draftState => { }));
+            globalStateDispatcher.next(produce(storeState, draftState => { }));
         }
     }
 }
